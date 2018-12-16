@@ -48,7 +48,7 @@ namespace Botwinder.modules
 			new PropertySpecification(1, true, false, "Platforms", new string[]{"-p", "--platform"}, new string[]{"PC", "XBox", "PS4"}, 13),
 			new PropertySpecification(2, true, false, "Timezones", new string[]{"-t", "--timezone"}, new string[]{"EU", "NA", "APAC"}, 14),
 			new PropertySpecification(3, false, false, "Comms type", new string[]{"-c", "--comms"}, new string[]{"Discord", "TeamSpeak", "Mumble", "Ventrilo", "Steam"}),
-			new PropertySpecification(4, true, true, "Squadron", new string[]{"-s", "--squadron"}, null, 30),
+			new PropertySpecification(4, true, true, "Squadron", new string[]{"-s", "--squadron"}, null, 30, "`", "`"),
 			new PropertySpecification(5, true, true, "Squadron ID", new string[]{"-i", "--squadronId"}, null, 4, "`[", "]`"),
 			new PropertySpecification(6, false, true, "Links", new string[]{"-l", "--link"}, null, 100),
 			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 300)
@@ -106,12 +106,20 @@ namespace Botwinder.modules
 				{
 					IMessage[] downloaded = await channel.GetMessagesAsync(lastMessage, Direction.After, 100, CacheMode.AllowDownload).Flatten().ToArray();
 					lastMessage = messages.FirstOrDefault()?.Id ?? 0;
+					Console.WriteLine($"Downloaded {downloaded.Length} message in {channel.Name}");
 					downloadedCount = downloaded.Length;
 					if( messages.Any() )
 						messages.AddRange(downloaded);
 				} while( downloadedCount >= 100 && lastMessage > 0 );
 
-				IMessage message = messages.FirstOrDefault(m => guid.TryParse(m.Content, out guid id) && id == e.Message.Author.Id);
+				IMessage message = messages.FirstOrDefault(m => {
+					if( guid.TryParse(m.Content, out guid id) && id == e.Message.Author.Id )
+						return true;
+
+					Console.WriteLine($"DID NOT MATCH: {m.Content}");
+					Console.WriteLine(e.Message.Author.Id.ToString());
+					return false;
+				});
 				if( message != null )
 				{
 					//todo support modifying a single property...
@@ -189,7 +197,7 @@ namespace Botwinder.modules
 
 			if( fields.ContainsKey(this.Properties.First()) )
 			{
-				embedBuilder.ThumbnailUrl = embedBuilder.Author.Url = fields.FirstOrDefault(f => f.Key.Order == -1).Value;
+				embedBuilder.ThumbnailUrl = embedBuilder.Author.IconUrl = fields.FirstOrDefault(f => f.Key.Order == -1).Value;
 			}
 
 			foreach( PropertySpecification property in this.Properties )
