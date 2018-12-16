@@ -106,20 +106,12 @@ namespace Botwinder.modules
 				{
 					IMessage[] downloaded = await channel.GetMessagesAsync(lastMessage, Direction.After, 100, CacheMode.AllowDownload).Flatten().ToArray();
 					lastMessage = messages.FirstOrDefault()?.Id ?? 0;
-					Console.WriteLine($"Downloaded {downloaded.Length} message in {channel.Name}");
 					downloadedCount = downloaded.Length;
-					if( messages.Any() )
+					if( downloaded.Any() )
 						messages.AddRange(downloaded);
 				} while( downloadedCount >= 100 && lastMessage > 0 );
 
-				IMessage message = messages.FirstOrDefault(m => {
-					if( guid.TryParse(m.Content, out guid id) && id == e.Message.Author.Id )
-						return true;
-
-					Console.WriteLine($"DID NOT MATCH: {m.Content}");
-					Console.WriteLine(e.Message.Author.Id.ToString());
-					return false;
-				});
+				IMessage message = messages.FirstOrDefault(m => guid.TryParse(m.Content, out guid id) && id == e.Message.Author.Id);
 				if( message != null )
 				{
 					//todo support modifying a single property...
