@@ -78,7 +78,7 @@ namespace Botwinder.modules
 				if( e.Server.Id != 89778537522802688 )
 					return;
 
-				string response = "```md\n Create or modify your #recruitment post with the following properties:\n\n" +
+				string response = "```md\nCreate or modify your #recruitment post with the following properties:\n\n" +
 				                  "[ -b ][ --logo        ] | Optional URL to your logo (up to 128px)\n" +
 				                  "[ -n ][ --name        ] | Name of your playergroup (up to 30char)\n" +
 				                  "[ -p ][ --platform    ] | Platform: PC, XBox or PS4\n" +
