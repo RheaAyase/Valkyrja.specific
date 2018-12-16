@@ -88,7 +88,7 @@ namespace Botwinder.modules
 				                  "[ -i ][ --squadronId  ] | [ID] of the squadron (optional field = 4char)\n" +
 				                  "[ -l ][ --link        ] | Links to your Inara or Discord (optional field up to 100char)\n" +
 				                  "[ -d ][ --description ] | Up to 300 characters of group description.\n" +
-				                  "\nNote: --comms, --link and --description can be text that supports [markdown](links)." +
+				                  "\nNote: --link and --description can be text that supports [markdown](links)." +
 				                  "\nExample: !recruitment --name The Elite -p PC PS4 XBox -t EU NA APAC -c [Discord](https://discord.gg/elite) -d Weirdoes." +
 				                  "\n```";
 
