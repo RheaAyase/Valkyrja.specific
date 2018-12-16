@@ -154,7 +154,7 @@ namespace Botwinder.modules
 				string value = match.Value.Substring(optionString.Length + 1).Replace('`', '\'');
 
 				PropertySpecification property = this.Properties.FirstOrDefault(p => p.Options.Contains(optionString));
-				if( property == null || (property.ValidValues != null && property.ValidValues.Length > 4 && !property.ValidValues.Contains(value.ToLower())) || value.Length > property.CharacterLimit )
+				if( property == null || (property.ValidValues != null && property.ValidValues.Length > 4 && property.ValidValues.All(v => v.ToLower() != value.ToLower())) || value.Length > property.CharacterLimit )
 					return $"`{value}` is invalid..";
 
 				if( property.ValidValues != null)
@@ -162,19 +162,20 @@ namespace Botwinder.modules
 					MatchCollection parsedValues = this.ProfileValueRegex.Matches(value);
 					if( property.ValidValues.Length <= 4 )
 					{
-						value = "";
+						string newValue = "";
 						for( int i = 0; i < parsedValues.Count; i++ )
 						{
-							string val = property.ValidValues.FirstOrDefault(v => v.Contains(parsedValues[i].Value.ToLower()));
+							string val = property.ValidValues.FirstOrDefault(v => v.ToLower() == parsedValues[i].Value.ToLower());
 							if( string.IsNullOrEmpty(val) )
 								return $"{value} is invalid...";
 
-							value += i == 0 ? $"`{val}`" : $" | `{val}`";
+							newValue += i == 0 ? $"`{val}`" : $" | `{val}`";
 						}
+						value = newValue;
 					}
 					else
 					{
-						string val = property.ValidValues.FirstOrDefault(v => v.Contains(parsedValues[0].Value.ToLower()));
+						string val = property.ValidValues.FirstOrDefault(v => v.ToLower() == parsedValues[0].Value.ToLower());
 						value = $"`{val}`";
 					}
 				}
