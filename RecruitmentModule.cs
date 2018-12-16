@@ -101,12 +101,13 @@ namespace Botwinder.modules
 				do
 				{
 					IMessage[] downloaded = await channel.GetMessagesAsync(lastMessage, Direction.After, 100, CacheMode.AllowDownload).Flatten().ToArray();
-					lastMessage = messages.First().Id; //Assuming that the first message is the most recent.
+					lastMessage = messages.FirstOrDefault()?.Id ?? 0;
 					downloadedCount = downloaded.Length;
-					messages.AddRange(downloaded);
-				} while( downloadedCount >= 100 );
+					if( messages.Any() )
+						messages.AddRange(downloaded);
+				} while( downloadedCount >= 100 && lastMessage > 0 );
 
-				IMessage message = messages.FirstOrDefault(m => m.Author.Id == e.Message.Author.Id);
+				IMessage message = messages.FirstOrDefault(m => guid.TryParse(m.Content, out guid id) && id == e.Message.Author.Id);
 				if( message != null )
 				{
 					//todo support modifying a single property...
@@ -119,7 +120,7 @@ namespace Botwinder.modules
 				Embed embed = GetRecruitmentEmbed(e);
 				if( embed != null )
 				{
-					await channel.SendMessageAsync("", embed: embed);
+					await channel.SendMessageAsync(e.Message.Author.Id.ToString(), embed: embed);
 					response = "All done!";
 				}
 
