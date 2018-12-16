@@ -155,7 +155,7 @@ namespace Botwinder.modules
 
 				PropertySpecification property = this.Properties.FirstOrDefault(p => p.Options.Contains(optionString));
 				if( property == null || (property.ValidValues != null && property.ValidValues.Length > 4 && !property.ValidValues.Contains(value.ToLower())) || value.Length > property.CharacterLimit )
-					return $"`{value}` is invalid";
+					return $"`{value}` is invalid..";
 
 				if( property.ValidValues != null)
 				{
@@ -167,7 +167,7 @@ namespace Botwinder.modules
 						{
 							string val = property.ValidValues.FirstOrDefault(v => v.Contains(parsedValues[i].Value.ToLower()));
 							if( string.IsNullOrEmpty(val) )
-								return $"{value} is invalid";
+								return $"{value} is invalid...";
 
 							value += i == 0 ? $"`{val}`" : $" | `{val}`";
 						}
