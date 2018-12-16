@@ -23,8 +23,10 @@ namespace Botwinder.modules
 			public string[] Options = null;
 			public string[] ValidValues = null;
 			public int CharacterLimit = 10;
+			public string Prefix = "";
+			public string Suffix = "";
 
-			public PropertySpecification(int order, bool inline, bool optional, string label, string[] options, string[] validValues = null, int characterLimit=10)
+			public PropertySpecification(int order, bool inline, bool optional, string label, string[] options, string[] validValues = null, int characterLimit=10, string prefix = "", string suffix = "")
 			{
 				this.Order = order;
 				this.Inline = inline;
@@ -33,6 +35,8 @@ namespace Botwinder.modules
 				this.Options = options;
 				this.ValidValues = validValues;
 				this.CharacterLimit = characterLimit;
+				this.Prefix = prefix;
+				this.Suffix = suffix;
 			}
 		}
 
@@ -45,7 +49,7 @@ namespace Botwinder.modules
 			new PropertySpecification(2, true, false, "Timezones", new string[]{"-t", "--timezone"}, new string[]{"EU", "NA", "APAC"}),
 			new PropertySpecification(3, false, false, "Comms type", new string[]{"-c", "--comms"}, new string[]{"Discord", "TeamSpeak", "Mumble", "Ventrilo", "Steam"}),
 			new PropertySpecification(4, true, true, "Squadron", new string[]{"-s", "--squadron"}, null, 30),
-			new PropertySpecification(5, true, true, "Squadron ID", new string[]{"-i", "--squadronId"}, null, 4),
+			new PropertySpecification(5, true, true, "Squadron ID", new string[]{"-i", "--squadronId"}, null, 4, "`[", "]`"),
 			new PropertySpecification(6, false, true, "Links", new string[]{"-l", "--link"}, null, 100),
 			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 300)
 		};
@@ -81,7 +85,7 @@ namespace Botwinder.modules
 				                  "[ -t ][ --timezone    ] | Timezone: EU, NA or APAC\n" +
 				                  "[ -c ][ --comms       ] | Comms type: Discord, TeamSpeak, Mumble, Ventrilo or Steam\n" +
 				                  "[ -s ][ --squadron    ] | Name of the squadron (optional field up to 30char)\n" +
-				                  "[ -i ][ --squadronId  ] | [ID] of the squadron (optional field)\n" +
+				                  "[ -i ][ --squadronId  ] | [ID] of the squadron (optional field = 4char)\n" +
 				                  "[ -l ][ --link        ] | Links to your Inara or Discord (optional field up to 100char)\n" +
 				                  "[ -d ][ --description ] | Up to 300 characters of group description.\n" +
 				                  "\nNote: --comms, --link and --description can be text that supports [markdown](links)." +
@@ -117,11 +121,18 @@ namespace Botwinder.modules
 					await message.DeleteAsync();
 				}
 
-				Embed embed = GetRecruitmentEmbed(e);
+				object embed = GetRecruitmentEmbed(e);
 				if( embed != null )
 				{
-					await channel.SendMessageAsync(e.Message.Author.Id.ToString(), embed: embed);
-					response = "All done!";
+					if( embed is Embed )
+					{
+						await channel.SendMessageAsync(e.Message.Author.Id.ToString(), embed: embed as Embed);
+						response = "All done!";
+					}
+					else if( embed is string )
+					{
+						response = $"{embed as string}\n{response}";
+					}
 				}
 
 				await e.SendReplySafe(response);
@@ -132,7 +143,7 @@ namespace Botwinder.modules
 			return commands;
 		}
 
-		private Embed GetRecruitmentEmbed(CommandArguments e)
+		private object GetRecruitmentEmbed(CommandArguments e)
 		{
 			Dictionary<PropertySpecification, string> fields = new Dictionary<PropertySpecification, string>();
 
@@ -143,8 +154,8 @@ namespace Botwinder.modules
 				string value = match.Value.Substring(optionString.Length + 1).Replace('`', '\'');
 
 				PropertySpecification property = this.Properties.FirstOrDefault(p => p.Options.Contains(optionString));
-				if( property == null || (property.ValidValues != null && property.ValidValues.Length > 4 && property.ValidValues.Contains(value.ToLower())) || value.Length > property.CharacterLimit )
-					return null;
+				if( property == null || (property.ValidValues != null && property.ValidValues.Length > 4 && !property.ValidValues.Contains(value.ToLower())) || value.Length > property.CharacterLimit )
+					return $"`{value}` is invalid";
 
 				if( property.ValidValues != null)
 				{
@@ -156,7 +167,7 @@ namespace Botwinder.modules
 						{
 							string val = property.ValidValues.FirstOrDefault(v => v.Contains(parsedValues[i].Value.ToLower()));
 							if( string.IsNullOrEmpty(val) )
-								return null;
+								return $"{value} is invalid";
 
 							value += i == 0 ? $"`{val}`" : $" | `{val}`";
 						}
@@ -183,12 +194,12 @@ namespace Botwinder.modules
 			foreach( PropertySpecification property in this.Properties )
 			{
 				if( !fields.ContainsKey(property) && !property.Optional )
-					return null;
+					return $"{property.Label} is missing";
 
 				if( !fields.ContainsKey(property) || property.Order <= 0 )
 					continue;
 
-				embedBuilder.AddField(property.Label, fields.Values, property.Inline);
+				embedBuilder.AddField(property.Label, $"{property.Prefix}{fields[property]}{property.Suffix}", property.Inline);
 			}
 
 			return embedBuilder.Build();
