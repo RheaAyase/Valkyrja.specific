@@ -102,6 +102,7 @@ namespace Botwinder.modules
 				{
 					IMessage[] downloaded = await channel.GetMessagesAsync(lastMessage, Direction.After, 100, CacheMode.AllowDownload).Flatten().ToArray();
 					lastMessage = messages.First().Id; //Assuming that the first message is the most recent.
+					downloadedCount = downloaded.Length;
 					messages.AddRange(downloaded);
 				} while( downloadedCount >= 100 );
 
