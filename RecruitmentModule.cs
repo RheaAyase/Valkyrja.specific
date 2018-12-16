@@ -81,11 +81,12 @@ namespace Botwinder.modules
 				                  "[ -t ][ --timezone    ] | Timezone: EU, NA or APAC\n" +
 				                  "[ -c ][ --comms       ] | Comms type: Discord, TeamSpeak, Mumble, Ventrilo or Steam\n" +
 				                  "[ -s ][ --squadron    ] | Name of the squadron (optional field up to 30char)\n" +
-				                  "[ -i ][ --squadronID  ] | [ID] of the squadron (optional field)\n" +
+				                  "[ -i ][ --squadronId  ] | [ID] of the squadron (optional field)\n" +
 				                  "[ -l ][ --link        ] | Links to your Inara or Discord (optional field up to 100char)\n" +
 				                  "[ -d ][ --description ] | Up to 300 characters of group description.\n" +
 				                  "\nNote: --comms, --link and --description can be text that supports [markdown](links)." +
-				                  "\nExample: !recruitment --name The Elite -p PC PS4 XBox -t EU NA APAC -c [Discord](https://discord.gg/elite) -d Weirdoes.";
+				                  "\nExample: !recruitment --name The Elite -p PC PS4 XBox -t EU NA APAC -c [Discord](https://discord.gg/elite) -d Weirdoes." +
+				                  "\n```";
 
 				if( string.IsNullOrEmpty(e.TrimmedMessage) )
 				{
@@ -114,8 +115,14 @@ namespace Botwinder.modules
 					await message.DeleteAsync();
 				}
 
-				await channel.SendMessageAsync("", embed: GetRecruitmentEmbed(e));
-				await e.SendReplySafe("All done.");
+				Embed embed = GetRecruitmentEmbed(e);
+				if( embed != null )
+				{
+					await channel.SendMessageAsync("", embed: embed);
+					response = "All done!";
+				}
+
+				await e.SendReplySafe(response);
 			};
 			commands.Add(newCommand);
 			commands.Add(newCommand.CreateAlias("recruit"));
