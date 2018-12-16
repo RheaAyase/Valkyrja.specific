@@ -45,8 +45,8 @@ namespace Botwinder.modules
 		private readonly IEnumerable<PropertySpecification> Properties = new List<PropertySpecification>{
 			new PropertySpecification(-1, false, true, "", new string[]{"-b", "--logo"}, null, 500),
 			new PropertySpecification(0, false, false, "Name", new string[]{"-n", "--name"}, null, 30),
-			new PropertySpecification(1, true, false, "Platforms", new string[]{"-p", "--platform"}, new string[]{"PC", "XBox", "PS4"}),
-			new PropertySpecification(2, true, false, "Timezones", new string[]{"-t", "--timezone"}, new string[]{"EU", "NA", "APAC"}),
+			new PropertySpecification(1, true, false, "Platforms", new string[]{"-p", "--platform"}, new string[]{"PC", "XBox", "PS4"}, 13),
+			new PropertySpecification(2, true, false, "Timezones", new string[]{"-t", "--timezone"}, new string[]{"EU", "NA", "APAC"}, 14),
 			new PropertySpecification(3, false, false, "Comms type", new string[]{"-c", "--comms"}, new string[]{"Discord", "TeamSpeak", "Mumble", "Ventrilo", "Steam"}),
 			new PropertySpecification(4, true, true, "Squadron", new string[]{"-s", "--squadron"}, null, 30),
 			new PropertySpecification(5, true, true, "Squadron ID", new string[]{"-i", "--squadronId"}, null, 4, "`[", "]`"),
