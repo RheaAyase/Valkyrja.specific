@@ -51,7 +51,7 @@ namespace Botwinder.modules
 			new PropertySpecification(4, true, true, "Squadron", new string[]{"-s", "--squadron"}, null, 30, "`", "`"),
 			new PropertySpecification(5, true, true, "Squadron ID", new string[]{"-i", "--squadronId"}, null, 4, "`[", "]`"),
 			new PropertySpecification(6, false, true, "Links", new string[]{"-l", "--link"}, null, 100),
-			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 300)
+			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 500)
 		};
 
 		private readonly Regex ProfileParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
@@ -87,7 +87,7 @@ namespace Botwinder.modules
 				                  "[ -s ][ --squadron    ] | Name of the squadron (optional field up to 30char)\n" +
 				                  "[ -i ][ --squadronId  ] | [ID] of the squadron (optional field = 4char)\n" +
 				                  "[ -l ][ --link        ] | Links to your Inara or Discord (optional field up to 100char)\n" +
-				                  "[ -d ][ --description ] | Up to 300 characters of group description.\n" +
+				                  "[ -d ][ --description ] | Up to 500 characters of group description.\n" +
 				                  "\nNote: --link and --description can be text that supports [markdown](links)." +
 				                  "\nExample: !recruitment --name The Elite -p PC PS4 XBox -t EU NA APAC -c Discord --link [Discord](https://discord.gg/elite) -d Weirdoes." +
 				                  "\n```";
