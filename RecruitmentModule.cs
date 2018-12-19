@@ -54,9 +54,10 @@ namespace Botwinder.modules
 			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 500)
 		};
 
-		private readonly Regex ProfileParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
-		private readonly Regex ProfileOptionRegex = new Regex("--?\\w+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
-		private readonly Regex ProfileValueRegex = new Regex("\\w+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+		private readonly Regex CommandParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+		private readonly Regex CommandOptionRegex = new Regex("--?\\w+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+		private readonly Regex CommandValueRegex = new Regex("\\w+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+		private readonly Regex UserIdRegex = new Regex("\\d+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
 		private BotwinderClient Client;
 
@@ -111,9 +112,10 @@ namespace Botwinder.modules
 						messages.AddRange(downloaded);
 				} while( downloadedCount >= 100 && lastMessage > 0 );
 
-				IMessage message = messages.FirstOrDefault(m => guid.TryParse(m.Content, out guid id) && id == e.Message.Author.Id);
+				IMessage message = messages.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == e.Message.Author.Id);
 				if( message != null )
 				{
+					//todo if( message.embed == newembed ) return; ~ do not just bump the post without changing anything.
 					//todo support modifying a single property...
 					//await (message as SocketUserMessage).ModifyAsync(m => ModifyRecruitmentEmbed(e, m));
 					//await e.SendReplySafe("All done.");
@@ -126,7 +128,7 @@ namespace Botwinder.modules
 				{
 					if( embed is Embed )
 					{
-						await channel.SendMessageAsync(e.Message.Author.Id.ToString(), embed: embed as Embed);
+						await channel.SendMessageAsync($"<@{e.Message.Author.Id}>'s post:", embed: embed as Embed);
 						response = "All done!";
 					}
 					else if( embed is string )
@@ -147,10 +149,10 @@ namespace Botwinder.modules
 		{
 			Dictionary<PropertySpecification, string> fields = new Dictionary<PropertySpecification, string>();
 
-			MatchCollection matches = this.ProfileParamRegex.Matches(e.TrimmedMessage);
+			MatchCollection matches = this.CommandParamRegex.Matches(e.TrimmedMessage);
 			foreach( Match match in matches )
 			{
-				string optionString = this.ProfileOptionRegex.Match(match.Value).Value;
+				string optionString = this.CommandOptionRegex.Match(match.Value).Value;
 				string value = match.Value.Substring(optionString.Length + 1).Replace('`', '\'');
 
 				PropertySpecification property = this.Properties.FirstOrDefault(p => p.Options.Contains(optionString));
@@ -159,7 +161,7 @@ namespace Botwinder.modules
 
 				if( property.ValidValues != null)
 				{
-					MatchCollection parsedValues = this.ProfileValueRegex.Matches(value);
+					MatchCollection parsedValues = this.CommandValueRegex.Matches(value);
 					if( property.ValidValues.Length <= 4 )
 					{
 						string newValue = "";
