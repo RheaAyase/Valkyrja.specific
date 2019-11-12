@@ -81,7 +81,7 @@ namespace Botwinder.modules
 			new PropertySpecification(3, false, false, "Goals", new string[]{"-g", "--goals"}, null, 100),
 			new PropertySpecification(4, false, false, "CurrentProgress", new string[]{"-p", "--progress"}, null, 100),
 			new PropertySpecification(5, false, true, "Schedule", new string[]{"-s", "--schedule"}, null, 100),
-			new PropertySpecification(5, false, false, "Contact", new string[]{"-c", "--contact"}, null, 100),
+			new PropertySpecification(5, false, false, "Contact", new string[]{"-k", "--contact"}, null, 50),
 			new PropertySpecification(6, false, false, "Description", new string[]{"-d", "--description"}, null, 350)
 		};
 
@@ -98,11 +98,12 @@ namespace Botwinder.modules
 		                       "[ -b ][ --logo        ] | Optional URL to your logo (up to 128px)\n" +
 		                       "[ -n ][ --name        ] | Name of your group (up to 30char)\n" +
 		                       "[ -c ][ --composition ] | Current composition - space delimited list of roles \n" +
-		                       "[ -l ][ --lookingfor    ] | Timezone: EU, NA or APAC\n" +
+		                       "[ -l ][ --lookingfor  ] | Timezone: EU, NA or APAC\n" +
 		                       "[ -g ][ --goals       ] | Comms type: Discord, TeamSpeak, Mumble, Ventrilo or Steam\n" +
 		                       "[ -p ][ --progress    ] | Name of the squadron (optional field up to 30char)\n" +
-		                       "[ -s ][ --schedule  ] | [ID] of the squadron (optional field = 4char)\n" +
-		                       "[ -d ][ --description ] | Up to 500 characters of group description.\n" +
+		                       "[ -s ][ --schedule  ]   | [ID] of the squadron (optional field = 4char)\n" +
+		                       "[ -k ][ --contact  ]    | User mention of a contact to reach out to\n" +
+		                       "[ -d ][ --description ] | Up to 500 characters of group description\n" +
 		                       "\nNote: --description can be text that supports [markdown](links)." +
 		                       "\nExample: ?recruitment --name Nine Valkyries -c PLD AST DNC -l :melee: -g Savage & Alex -p Cleared it all. -c @Valkyrja#7811 -d Die in Battle and Go to Valhalla!" +
 		                       "\n```";
