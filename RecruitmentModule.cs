@@ -109,7 +109,7 @@ namespace Botwinder.modules
 
 		private readonly Regex CommandParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 		private readonly Regex CommandOptionRegex = new Regex("--?\\w+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
-		private readonly Regex CommandValueRegex = new Regex("<?:?\\w+((?=:):\\d+>)?", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+		private readonly Regex CommandValueRegex = new Regex("<?[:@]?!?\\w+((?=:):\\d+>)?>?", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 		private readonly Regex UserIdRegex = new Regex("\\d+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
 		private BotwinderClient Client;
