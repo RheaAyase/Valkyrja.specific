@@ -220,8 +220,8 @@ namespace Botwinder.modules
 
 				PropertySpecification property = properties.FirstOrDefault(p => p.Options.Contains(optionString));
 
-				if( property == null || (property.ValidValues != null && property.ValidValues.Length > 0 && property.ValidValues.All(v => v.ToLower() != value.ToLower())) )
-					return $"Invalid value:\n```\n{value}\n```";
+				if( property == null )
+					return $"Invalid option:\n```\n{optionString}\n```";
 
 				if( value.Length > property.CharacterLimit )
 					return $"Value exceeds the character limit of `{property.CharacterLimit}` characters with `{value.Length}`:\n```\n{value}\n```";
@@ -234,7 +234,7 @@ namespace Botwinder.modules
 						{
 							string val = property.ValidValues.FirstOrDefault(v => v.ToLower() == parsedValues[i].Value.ToLower());
 							if( string.IsNullOrEmpty(val) )
-								return $"Invalid value:\n```\n{value}\n```";
+								return $"Invalid value:\n```\n{val}\n```";
 
 							val = $"{property.Prefix}{val}{property.Suffix}";
 							valueBuilder.Append(i == 0 ? val : (property.Delimiter + val));
