@@ -77,7 +77,7 @@ namespace Botwinder.modules
 			new PropertySpecification(-1, false, true, "", new string[]{"-t", "--logo"}, null, 300),
 			new PropertySpecification(0, false, false, "Name", new string[]{"-n", "--name"}, null, 30),
 			new PropertySpecification(1, true, false, "Current Composition", new string[]{"-c", "--composition"}, new string[]{"PLD", "GNB", "DRK", "WAR", "WHM", "AST", "SCH", "SAM", "MCH", "BLM", "DNC", "BRD", "SMN", "MNK", "RDM", "NIN", "DRG"}, 30, " ", "`", "`"),
-			new PropertySpecification(2, true, false, "Looking for", new string[]{"-l", "--lookingfor"}, new string[]{":pld:", ":gnb:", ":drk:", ":war:", ":whm:", ":ast:", ":sch:", ":sam:", ":mch:", ":blm:", ":dnc:", ":brd:", ":smn:", ":mnk:", ":rdm:", ":nin:", ":drg:", ":healer:", ":tank:", ":dps:", ":caster:", ":ranged:", ":melee:"}, 40, ""),
+			new PropertySpecification(2, true, false, "Looking for", new string[]{"-l", "--lookingfor"}, new string[]{"<:pld:476449887290916876>", "<:gnb:581102434571780107>", "<:drk:476449887597101056>", "<:war:476449887702220810>", "<:whm:476449887261687809>", "<:ast:476449887274401798>", "<:sch:476449887546769409>", "<:sam:476449887547031574>", "<:mch:476449887140052993>", "<:blm:476449887312150548>", "<:dnc:581102425327403008>", "<:brd:476449887311888385>", "<:smn:476449887672729610>", "<:mnk:476449887198773249>", "<:rdm:476449887190515716>", "<:nin:476449887496568832>", "<:drg:476449887337316353>", "<:healer:476449887391842304>", "<:tank:477224797315530752>", "<:dps:357417680799793162>", "<:caster:347159836225699851>", "<:ranged:347159816331853826>", "<:melee:347159777991852033>"}, 40, ""),
 			new PropertySpecification(3, false, false, "Goals", new string[]{"-g", "--goals"}, null, 100),
 			new PropertySpecification(4, false, false, "CurrentProgress", new string[]{"-p", "--progress"}, null, 100),
 			new PropertySpecification(5, false, true, "Schedule", new string[]{"-s", "--schedule"}, null, 100),
@@ -109,7 +109,7 @@ namespace Botwinder.modules
 
 		private readonly Regex CommandParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 		private readonly Regex CommandOptionRegex = new Regex("--?\\w+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
-		private readonly Regex CommandValueRegex = new Regex(":?\\w+:?", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+		private readonly Regex CommandValueRegex = new Regex("<?:?\\w+:?>?", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 		private readonly Regex UserIdRegex = new Regex("\\d+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
 		private BotwinderClient Client;
@@ -122,8 +122,49 @@ namespace Botwinder.modules
 			this.Client = iClient as BotwinderClient;
 			List<Command> commands = new List<Command>();
 
+// !removeRecruitment
+			Command newCommand = new Command("removeRecruitment");
+			newCommand.Type = CommandType.Standard;
+			newCommand.Description = "";
+			newCommand.RequiredPermissions = PermissionType.Everyone;
+			newCommand.IsHidden = true;
+			newCommand.OnExecute += async e => {
+				if( e.Server.Id != this.EdcId && e.Server.Id != this.FfxivId )
+					return;
+
+				string response = "";
+				IMessageChannel channel = null;
+				guid lastMessage = 0;
+				if( e.Server.Id == this.EdcId )
+				{
+					response = this.EdcHelpString;
+					channel = e.Server.Guild.GetTextChannel(this.EdcChannelId);
+					lastMessage = this.EdcMessageId;
+				}
+				else if( e.Server.Id == this.FfxivId )
+				{
+					if( !this.FfxivChannelIds.ContainsKey(e.Channel.Id) )
+					{
+						return;
+					}
+
+					response = this.FfxivHelpString;
+					channel = e.Server.Guild.GetTextChannel(this.FfxivChannelIds[e.Channel.Id]);
+					lastMessage = this.FfxivMessageIds[channel.Id];
+				}
+				else
+				{
+					return;
+				}
+
+				await DeletePreviousMessage(channel, lastMessage);
+
+				await e.SendReplySafe("Byeee!");
+			};
+			commands.Add(newCommand);
+
 // !recruitment
-			Command newCommand = new Command("recruitment");
+			newCommand = new Command("recruitment");
 			newCommand.Type = CommandType.Standard;
 			newCommand.Description = "";
 			newCommand.RequiredPermissions = PermissionType.Everyone;
@@ -163,27 +204,7 @@ namespace Botwinder.modules
 					return;
 				}
 
-				List<IMessage> messages = new List<IMessage>();
-				int downloadedCount = 0;
-				do
-				{
-					IMessage[] downloaded = await channel.GetMessagesAsync(lastMessage, Direction.After, 100, CacheMode.AllowDownload).Flatten().ToArray();
-					lastMessage = messages.FirstOrDefault()?.Id ?? 0;
-					downloadedCount = downloaded.Length;
-					if( downloaded.Any() )
-						messages.AddRange(downloaded);
-				} while( downloadedCount >= 100 && lastMessage > 0 );
-
-				IMessage message = messages.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == e.Message.Author.Id);
-				if( message != null )
-				{
-					//todo if( message.embed == newembed ) return; ~ do not just bump the post without changing anything.
-					//todo support modifying a single property...
-					//await (message as SocketUserMessage).ModifyAsync(m => ModifyRecruitmentEmbed(e, m));
-					//await e.SendReplySafe("All done.");
-					//return;
-					await message.DeleteAsync();
-				}
+				await DeletePreviousMessage(channel, lastMessage);
 
 				object embed = GetRecruitmentEmbed(e);
 				if( embed != null )
@@ -205,6 +226,31 @@ namespace Botwinder.modules
 			commands.Add(newCommand.CreateAlias("recruit"));
 
 			return commands;
+		}
+
+		private async Task DeletePreviousMessage(IMessageChannel channel, guid lastMessage)
+		{
+			List<IMessage> messages = new List<IMessage>();
+			int downloadedCount = 0;
+			do
+			{
+				IMessage[] downloaded = await channel.GetMessagesAsync(lastMessage, Direction.After, 100, CacheMode.AllowDownload).Flatten().ToArray();
+				lastMessage = messages.FirstOrDefault()?.Id ?? 0;
+				downloadedCount = downloaded.Length;
+				if( downloaded.Any() )
+					messages.AddRange(downloaded);
+			} while( downloadedCount >= 100 && lastMessage > 0 );
+
+			IMessage message = messages.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == e.Message.Author.Id);
+			if( message != null )
+			{
+				//todo if( message.embed == newembed ) return; ~ do not just bump the post without changing anything.
+				//todo support modifying a single property...
+				//await (message as SocketUserMessage).ModifyAsync(m => ModifyRecruitmentEmbed(e, m));
+				//await e.SendReplySafe("All done.");
+				//return;
+				await message.DeleteAsync();
+			}
 		}
 
 		private object GetRecruitmentEmbed(CommandArguments e)
