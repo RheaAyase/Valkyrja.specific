@@ -157,7 +157,7 @@ namespace Botwinder.modules
 					return;
 				}
 
-				await DeletePreviousMessage(channel, lastMessage);
+				await DeletePreviousMessage(channel, lastMessage, e.Message.Author.Id);
 
 				await e.SendReplySafe("Byeee!");
 			};
@@ -204,7 +204,7 @@ namespace Botwinder.modules
 					return;
 				}
 
-				await DeletePreviousMessage(channel, lastMessage);
+				await DeletePreviousMessage(channel, lastMessage, e.Message.Author.Id);
 
 				object embed = GetRecruitmentEmbed(e);
 				if( embed != null )
@@ -228,7 +228,7 @@ namespace Botwinder.modules
 			return commands;
 		}
 
-		private async Task DeletePreviousMessage(IMessageChannel channel, guid lastMessage)
+		private async Task DeletePreviousMessage(IMessageChannel channel, guid lastMessage, guid authorId)
 		{
 			List<IMessage> messages = new List<IMessage>();
 			int downloadedCount = 0;
@@ -241,7 +241,7 @@ namespace Botwinder.modules
 					messages.AddRange(downloaded);
 			} while( downloadedCount >= 100 && lastMessage > 0 );
 
-			IMessage message = messages.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == e.Message.Author.Id);
+			IMessage message = messages.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
 			if( message != null )
 			{
 				//todo if( message.embed == newembed ) return; ~ do not just bump the post without changing anything.
