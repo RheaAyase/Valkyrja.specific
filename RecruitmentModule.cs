@@ -104,7 +104,7 @@ namespace Botwinder.modules
 		                       "[ -s ][ --schedule  ] | [ID] of the squadron (optional field = 4char)\n" +
 		                       "[ -d ][ --description ] | Up to 500 characters of group description.\n" +
 		                       "\nNote: --description can be text that supports [markdown](links)." +
-		                       "\nExample: !recruitment --name Nine Valkyries -c PLD AST DNC -l :melee: -g Savage & Alex -p Cleared it all. -c @Valkyrja#7811 -d Die in Battle and Go to Valhalla!" +
+		                       "\nExample: ?recruitment --name Nine Valkyries -c PLD AST DNC -l :melee: -g Savage & Alex -p Cleared it all. -c @Valkyrja#7811 -d Die in Battle and Go to Valhalla!" +
 		                       "\n```";
 
 		private readonly Regex CommandParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
@@ -195,7 +195,7 @@ namespace Botwinder.modules
 					}
 					else if( embed is string )
 					{
-						response = $"{embed as string}\n{response}";
+						response = $"{embed as string}\n\n{response}";
 					}
 				}
 
@@ -232,9 +232,9 @@ namespace Botwinder.modules
 						StringBuilder valueBuilder = new StringBuilder();
 						for( int i = 0; i < parsedValues.Count; i++ )
 						{
-							string val = property.ValidValues.FirstOrDefault(v => v.ToLower() == parsedValues[i].Value.ToLower());
+							string val = property.ValidValues.FirstOrDefault(v => string.Equals(v, parsedValues[i].Value, StringComparison.CurrentCultureIgnoreCase));
 							if( string.IsNullOrEmpty(val) )
-								return $"Invalid value:\n```\n{val}\n```";
+								return $"Invalid value:\n```\n{parsedValues[i]}\n```";
 
 							val = $"{property.Prefix}{val}{property.Suffix}";
 							valueBuilder.Append(i == 0 ? val : (property.Delimiter + val));
