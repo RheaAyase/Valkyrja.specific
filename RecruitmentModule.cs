@@ -80,9 +80,9 @@ namespace Botwinder.modules
 			new PropertySpecification(2, true, false, "Looking for", new string[]{"-l", "--lookingfor"}, new string[]{"<:pld:476449887290916876>", "<:gnb:581102434571780107>", "<:drk:476449887597101056>", "<:war:476449887702220810>", "<:whm:476449887261687809>", "<:ast:476449887274401798>", "<:sch:476449887546769409>", "<:sam:476449887547031574>", "<:mch:476449887140052993>", "<:blm:476449887312150548>", "<:dnc:581102425327403008>", "<:brd:476449887311888385>", "<:smn:476449887672729610>", "<:mnk:476449887198773249>", "<:rdm:476449887190515716>", "<:nin:476449887496568832>", "<:drg:476449887337316353>", "<:healer:476449887391842304>", "<:tank:477224797315530752>", "<:dps:357417680799793162>", "<:caster:347159836225699851>", "<:ranged:347159816331853826>", "<:melee:347159777991852033>"}, 40, ""),
 			new PropertySpecification(3, false, false, "Goals", new string[]{"-g", "--goals"}, null, 100),
 			new PropertySpecification(4, false, false, "CurrentProgress", new string[]{"-p", "--progress"}, null, 100),
-			new PropertySpecification(5, false, true, "Schedule", new string[]{"-s", "--schedule"}, null, 100),
-			new PropertySpecification(5, false, false, "Contact", new string[]{"-k", "--contact"}, null, 50),
-			new PropertySpecification(6, false, false, "Description", new string[]{"-d", "--description"}, null, 350)
+			new PropertySpecification(5, true, false, "Contact", new string[]{"-k", "--contact"}, null, 50),
+			new PropertySpecification(6, true, true, "Schedule", new string[]{"-s", "--schedule"}, null, 100),
+			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 350)
 		};
 
 		private guid FfxivId = 142476055482073089;
@@ -95,17 +95,17 @@ namespace Botwinder.modules
 			[2] = 22
 		};
 		string FfxivHelpString = "```md\nCreate or modify your recruitment post with the following properties:\n\n" +
-		                       "[ -b ][ --logo        ] | Optional URL to your logo (up to 128px)\n" +
+		                       "[ -b ][ --logo        ] | Optional URL to your logo (optional, up to 128px)\n" +
 		                       "[ -n ][ --name        ] | Name of your group (up to 30char)\n" +
 		                       "[ -c ][ --composition ] | Current composition - space delimited list of roles \n" +
-		                       "[ -l ][ --lookingfor  ] | Timezone: EU, NA or APAC\n" +
-		                       "[ -g ][ --goals       ] | Comms type: Discord, TeamSpeak, Mumble, Ventrilo or Steam\n" +
-		                       "[ -p ][ --progress    ] | Name of the squadron (optional field up to 30char)\n" +
-		                       "[ -s ][ --schedule  ]   | [ID] of the squadron (optional field = 4char)\n" +
+		                       "[ -l ][ --lookingfor  ] | Looking for - class or role emojis\n" +
+		                       "[ -g ][ --goals       ] | Group goals. Savage? Ultimate?\n" +
+		                       "[ -p ][ --progress    ] | Current progress of the static\n" +
+		                       "[ -s ][ --schedule  ]   | Raid schedule, don't forget timezone (UTC?) (optional)\n" +
 		                       "[ -k ][ --contact  ]    | User mention of a contact to reach out to\n" +
 		                       "[ -d ][ --description ] | Up to 500 characters of group description\n" +
 		                       "\nNote: --description can be text that supports [markdown](links)." +
-		                       "\nExample: ?recruitment --name Nine Valkyries -c PLD AST DNC -l :melee: -g Savage & Alex -p Cleared it all. -c @Valkyrja#7811 -d Die in Battle and Go to Valhalla!" +
+		                       "\nExample: ?recruitment --name Nine Valkyries -c PLD AST DNC -l :melee: -g Savage & Ultimate -p Cleared it all. -c @Valkyrja#7811 -d Die in Battle and Go to Valhalla!" +
 		                       "\n```";
 
 		private readonly Regex CommandParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
