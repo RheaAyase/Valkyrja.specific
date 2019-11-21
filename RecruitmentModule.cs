@@ -294,7 +294,7 @@ namespace Botwinder.modules
 
 			EmbedBuilder embedBuilder = new EmbedBuilder();
 			embedBuilder.Author = new EmbedAuthorBuilder().WithName(fields.First(f => f.Key.Order == 0).Value);
-			embedBuilder.Color = Color.Orange;
+			embedBuilder.Color = e.Server.Id == this.EdcId ? Color.Orange : Color.Purple;
 
 			if( fields.ContainsKey(properties.First()) )
 			{
@@ -309,7 +309,7 @@ namespace Botwinder.modules
 				if( !fields.ContainsKey(property) || property.Order <= 0 )
 					continue;
 
-				embedBuilder.AddField(property.Label, $"{property.Prefix}{fields[property]}{property.Suffix}", property.Inline);
+				embedBuilder.AddField(property.Label, property.ValidValues == null ? $"{property.Prefix}{fields[property]}{property.Suffix}" : fields[property], property.Inline);
 			}
 
 			return embedBuilder.Build();
