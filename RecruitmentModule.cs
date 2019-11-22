@@ -87,24 +87,24 @@ namespace Botwinder.modules
 
 		private guid FfxivId = 142476055482073089;
 		private Dictionary<string, guid> FfxivChannelIds = new Dictionary<string, ulong>(){
-			["staticAether"] = 244850199707648001,
-			["staticPrimal"] = 295282046409113620,
-			["staticCrystal"] = 513870282889494528,
-			["staticLight"] = 513870642089689099,
-			["staticChaos"] = 295332981831237632,
-			["staticElemental"] = 309847961498681344,
-			["staticGaia"] = 570645429549531146,
-			["staticMana"] = 570645481013772309
+			["staticAether"] = 647459984870735892,
+			["staticPrimal"] = 647460088302272532,
+			["staticCrystal"] = 647460192446840842,
+			["staticChaos"] = 647460277339684883,
+			["staticLight"] = 647460352589561876,
+			["staticElemental"] = 647460426019373075,
+			["staticGaia"] = 647460490036903967,
+			["staticMana"] = 647460558177828874
 		};
 		private Dictionary<guid, guid> FfxivMessageIds = new Dictionary<ulong, ulong>(){
-			[244850199707648001] = 11,
-			[295282046409113620] = 11,
-			[513870282889494528] = 11,
-			[513870642089689099] = 11,
-			[295332981831237632] = 11,
-			[309847961498681344] = 11,
-			[570645429549531146] = 11,
-			[570645481013772309] = 11
+			[647459984870735892] = 647480500424015892, //aether
+			[647460088302272532] = 647480532321697820, //primal
+			[647460192446840842] = 647480562017370151, //crystal
+			[647460277339684883] = 647480602697793540, //chaos
+			[647460352589561876] = 647480648428421121, //light
+			[647460426019373075] = 647480706792030228, //elemental
+			[647460490036903967] = 647480763813724179, //gaia
+			[647460558177828874] = 647480798043176962  //mana
 		};
 		string FfxivHelpString = "```md\nCreate or modify your recruitment post with the following properties:\n\n" +
 		                       "[ -b ][ --logo        ] | Optional URL to your logo (optional, up to 128px)\n" +
@@ -200,13 +200,13 @@ namespace Botwinder.modules
 				}
 				else if( e.Server.Id == this.FfxivId )
 				{
-					if( !this.FfxivChannelIds.ContainsKey(e.Channel.Id) )
+					if( !this.FfxivChannelIds.ContainsKey(e.CommandId) )
 					{
 						return;
 					}
 
 					response = this.FfxivHelpString;
-					channel = e.Server.Guild.GetTextChannel(this.FfxivChannelIds[e.Channel.Id]);
+					channel = e.Server.Guild.GetTextChannel(this.FfxivChannelIds[e.CommandId]);
 					lastMessage = this.FfxivMessageIds[channel.Id];
 				}
 				else
