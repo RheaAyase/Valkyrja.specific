@@ -86,13 +86,25 @@ namespace Botwinder.modules
 		};
 
 		private guid FfxivId = 142476055482073089;
-		private Dictionary<guid, guid> FfxivChannelIds = new Dictionary<ulong, ulong>(){
-			[638837450046963722] = 638837450046963722,
-			[2] = 22
+		private Dictionary<string, guid> FfxivChannelIds = new Dictionary<string, ulong>(){
+			["staticAether"] = 244850199707648001,
+			["staticPrimal"] = 295282046409113620,
+			["staticCrystal"] = 513870282889494528,
+			["staticLight"] = 513870642089689099,
+			["staticChaos"] = 295332981831237632,
+			["staticElemental"] = 309847961498681344,
+			["staticGaia"] = 570645429549531146,
+			["staticMana"] = 570645481013772309
 		};
 		private Dictionary<guid, guid> FfxivMessageIds = new Dictionary<ulong, ulong>(){
-			[638837450046963722] = 643810161747689502,
-			[2] = 22
+			[244850199707648001] = 11,
+			[295282046409113620] = 11,
+			[513870282889494528] = 11,
+			[513870642089689099] = 11,
+			[295332981831237632] = 11,
+			[309847961498681344] = 11,
+			[570645429549531146] = 11,
+			[570645481013772309] = 11
 		};
 		string FfxivHelpString = "```md\nCreate or modify your recruitment post with the following properties:\n\n" +
 		                       "[ -b ][ --logo        ] | Optional URL to your logo (optional, up to 128px)\n" +
@@ -144,7 +156,7 @@ namespace Botwinder.modules
 				}
 				else if( e.Server.Id == this.FfxivId )
 				{
-					if( !this.FfxivChannelIds.ContainsKey(e.Channel.Id) )
+					if( !this.FfxivChannelIds.ContainsKey(e.CommandId) )
 					{
 						return;
 					}
@@ -228,6 +240,22 @@ namespace Botwinder.modules
 			};
 			commands.Add(newCommand);
 			commands.Add(newCommand.CreateAlias("recruit"));
+			newCommand = newCommand.CreateCopy("staticAether");
+			commands.Add(newCommand);
+			newCommand = newCommand.CreateCopy("staticPrimal");
+			commands.Add(newCommand);
+			newCommand = newCommand.CreateCopy("staticCrystal");
+			commands.Add(newCommand);
+			newCommand = newCommand.CreateCopy("staticLight");
+			commands.Add(newCommand);
+			newCommand = newCommand.CreateCopy("staticChaos");
+			commands.Add(newCommand);
+			newCommand = newCommand.CreateCopy("staticElemental");
+			commands.Add(newCommand);
+			newCommand = newCommand.CreateCopy("staticGaia");
+			commands.Add(newCommand);
+			newCommand = newCommand.CreateCopy("staticMana");
+			commands.Add(newCommand);
 
 			return commands;
 		}
