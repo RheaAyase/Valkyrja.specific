@@ -134,12 +134,12 @@ namespace Botwinder.modules
 					return;
 
 				string response = "";
-				IMessageChannel channel = null;
+				List<SocketTextChannel> channels = new List<SocketTextChannel>();
 				guid lastMessage = 0;
 				if( e.Server.Id == this.EdcId )
 				{
 					response = this.EdcHelpString;
-					channel = e.Server.Guild.GetTextChannel(this.EdcChannelId);
+					channels.Add(e.Server.Guild.GetTextChannel(this.EdcChannelId));
 					lastMessage = this.EdcMessageId;
 				}
 				else if( e.Server.Id == this.FfxivId )
@@ -150,15 +150,18 @@ namespace Botwinder.modules
 					}
 
 					response = this.FfxivHelpString;
-					channel = e.Server.Guild.GetTextChannel(this.FfxivChannelIds[e.Channel.Id]);
-					lastMessage = this.FfxivMessageIds[channel.Id];
+					channels = this.FfxivChannelIds.Select(c => e.Server.Guild.GetTextChannel(c.Value)).ToList();
 				}
 				else
 				{
 					return;
 				}
 
-				await DeletePreviousMessage(channel, lastMessage, e.Message.Author.Id);
+				foreach( SocketTextChannel channel in channels )
+				{
+					lastMessage = this.FfxivMessageIds[channel.Id];
+					await DeletePreviousMessage(channel, lastMessage, e.Message.Author.Id);
+				}
 
 				await e.SendReplySafe("Byeee!");
 			};
