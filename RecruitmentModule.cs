@@ -107,7 +107,7 @@ namespace Botwinder.modules
 			[647460558177828874] = 647480798043176962  //mana
 		};
 		string FfxivHelpString = "```md\nCreate or modify your recruitment post with the following properties:\n\n" +
-		                       "[ -b ][ --logo        ] | Optional URL to your logo (optional, up to 128px)\n" +
+		                       "[ -b ][ --logo        ] | URL to your logo (optional, up to 128px)\n" +
 		                       "[ -n ][ --name        ] | Name of your group (up to 30char)\n" +
 		                       "[ -c ][ --composition ] | Current composition - space delimited list of roles \n" +
 		                       "[ -l ][ --lookingfor  ] | Looking for - class or role emojis\n" +
@@ -323,8 +323,14 @@ namespace Botwinder.modules
 				fields.Add(property, value);
 			}
 
+			PropertySpecification nameProperty = properties.First(f => f.Order == 0);
+			if( !fields.ContainsKey(nameProperty) )
+			{
+				return $"`{nameProperty.Label}` is missing";
+			}
+
 			EmbedBuilder embedBuilder = new EmbedBuilder();
-			embedBuilder.Author = new EmbedAuthorBuilder().WithName(fields.First(f => f.Key.Order == 0).Value);
+			embedBuilder.Author = new EmbedAuthorBuilder().WithName(fields[nameProperty]);
 			embedBuilder.Color = e.Server.Id == this.EdcId ? Color.Orange : Color.Purple;
 
 			if( fields.ContainsKey(properties.First()) )
@@ -335,7 +341,7 @@ namespace Botwinder.modules
 			foreach( PropertySpecification property in properties )
 			{
 				if( !fields.ContainsKey(property) && !property.Optional )
-					return $"{property.Label} is missing";
+					return $"`{property.Label}` is missing";
 
 				if( !fields.ContainsKey(property) || property.Order <= 0 )
 					continue;
