@@ -26,8 +26,9 @@ namespace Botwinder.modules
 			public string Delimiter = "";
 			public string Prefix = "";
 			public string Suffix = "";
+			public Regex Regex = null;
 
-			public PropertySpecification(int order, bool inline, bool optional, string label, string[] options, string[] validValues = null, int characterLimit=10, string delimiter = "", string prefix = "", string suffix = "")
+			public PropertySpecification(int order, bool inline, bool optional, string label, string[] options, string[] validValues = null, int characterLimit=10, string delimiter = "", string prefix = "", string suffix = "", string regex = null)
 			{
 				this.Order = order;
 				this.Inline = inline;
@@ -39,6 +40,8 @@ namespace Botwinder.modules
 				this.Delimiter = delimiter;
 				this.Prefix = prefix;
 				this.Suffix = suffix;
+				if( !string.IsNullOrEmpty(regex) )
+					this.Regex = new Regex(regex, RegexOptions.Compiled);
 			}
 		}
 
@@ -319,15 +322,15 @@ namespace Botwinder.modules
 						}
 						value = valueBuilder.ToString();
 				}
+				else if( property.Regex != null && !property.Regex.Match(value).Success )
+					return $"```\n{value}\n```\n...does not match prescribed format for `{property.Label}`";
 
 				fields.Add(property, value);
 			}
 
 			PropertySpecification nameProperty = properties.First(f => f.Order == 0);
 			if( !fields.ContainsKey(nameProperty) )
-			{
 				return $"`{nameProperty.Label}` is missing";
-			}
 
 			EmbedBuilder embedBuilder = new EmbedBuilder();
 			embedBuilder.Author = new EmbedAuthorBuilder().WithName(fields[nameProperty]);
