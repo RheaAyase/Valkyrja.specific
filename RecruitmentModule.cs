@@ -120,7 +120,7 @@ namespace Botwinder.modules
 		                       "\nExample: ?recruitment --name Nine Valkyries -c PLD AST DNC -l :melee: -g Savage & Ultimate -p Cleared it all. -k @Valkyrja#7811 -d Die in Battle and Go to Valhalla!" +
 		                       "\n```";
 
-		private readonly Regex CommandParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+		private readonly Regex CommandParamRegex = new Regex("--?\\w+\\s(?!--?\\w|$).*?(?=\\s--?\\w|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100));
 		private readonly Regex CommandOptionRegex = new Regex("--?\\w+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 		private readonly Regex CommandValueRegex = new Regex("<?[:@]?!?\\w+((?=:):\\d+>)?>?", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 		private readonly Regex UserIdRegex = new Regex("\\d+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
