@@ -235,7 +235,7 @@ namespace Botwinder.modules
 					}
 					else if( embed is string )
 					{
-						response = $"{embed as string}\n\n{response}";
+						response = $"{embed as string}\n\n_(Use `{e.Server.Config.CommandPrefix}{e.CommandId}` without arguments for help.)_";
 					}
 				}
 
