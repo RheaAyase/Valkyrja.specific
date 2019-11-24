@@ -110,7 +110,7 @@ namespace Botwinder.modules
 			[647460558177828874] = 647480798043176962  //mana
 		};
 		string FfxivHelpString = "```md\nCreate or modify your recruitment post with the following properties:\n\n" +
-		                       "[ -b ][ --logo        ] | URL to your logo (optional, up to 128px)\n" +
+		                       "[ -t ][ --logo        ] | URL to your logo (optional, up to 128px)\n" +
 		                       "[ -n ][ --name        ] | Name of your group (up to 30char)\n" +
 		                       "[ -c ][ --composition ] | Current composition - space delimited list of roles \n" +
 		                       "[ -l ][ --lookingfor  ] | Looking for - class or role emojis\n" +
