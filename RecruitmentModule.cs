@@ -26,9 +26,10 @@ namespace Botwinder.modules
 			public string Delimiter = "";
 			public string Prefix = "";
 			public string Suffix = "";
+			public string RegexHelp = "";
 			public Regex Regex = null;
 
-			public PropertySpecification(int order, bool inline, bool optional, string label, string[] options, string[] validValues = null, int characterLimit=10, string delimiter = "", string prefix = "", string suffix = "", string regex = null)
+			public PropertySpecification(int order, bool inline, bool optional, string label, string[] options, string[] validValues = null, int characterLimit=10, string delimiter = "", string prefix = "", string suffix = "", string regexHelp = "", string regex = null)
 			{
 				this.Order = order;
 				this.Inline = inline;
@@ -41,7 +42,10 @@ namespace Botwinder.modules
 				this.Prefix = prefix;
 				this.Suffix = suffix;
 				if( !string.IsNullOrEmpty(regex) )
+				{
+					this.RegexHelp = regexHelp;
 					this.Regex = new Regex(regex, RegexOptions.Compiled);
+				}
 			}
 		}
 
@@ -83,7 +87,7 @@ namespace Botwinder.modules
 			new PropertySpecification(2, true, false, "Looking for", new string[]{"-l", "--lookingfor"}, new string[]{"<:pld:476449887290916876>", "<:gnb:581102434571780107>", "<:drk:476449887597101056>", "<:war:476449887702220810>", "<:whm:476449887261687809>", "<:ast:476449887274401798>", "<:sch:476449887546769409>", "<:sam:476449887547031574>", "<:mch:476449887140052993>", "<:blm:476449887312150548>", "<:dnc:581102425327403008>", "<:brd:476449887311888385>", "<:smn:476449887672729610>", "<:mnk:476449887198773249>", "<:rdm:476449887190515716>", "<:nin:476449887496568832>", "<:drg:476449887337316353>", "<:healer:476449887391842304>", "<:tank:477224797315530752>", "<:dps:357417680799793162>", "<:caster:347159836225699851>", "<:ranged:347159816331853826>", "<:melee:347159777991852033>"}, 150),
 			new PropertySpecification(3, false, false, "Goals", new string[]{"-g", "--goals"}, null, 100),
 			new PropertySpecification(4, false, false, "CurrentProgress", new string[]{"-p", "--progress"}, null, 100),
-			new PropertySpecification(5, true, false, "Contact", new string[]{"-k", "--contact"}, null, 55, "", "", "", "^<@!?\\d+>"),
+			new PropertySpecification(5, true, false, "Contact", new string[]{"-k", "--contact"}, null, 55, "", "", "", "@UserMention", "^<@!?\\d+>"),
 			new PropertySpecification(6, true, true, "Schedule", new string[]{"-s", "--schedule"}, null, 100),
 			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 350)
 		};
@@ -305,7 +309,7 @@ namespace Botwinder.modules
 					return $"Invalid option:\n```\n{optionString}\n```";
 
 				if( value.Length > property.CharacterLimit )
-					return $"Value exceeds the character limit of `{property.CharacterLimit}` characters with `{value.Length}`:\n```\n{value}\n```";
+					return $"`{property.Label}` exceeds the character limit of `{property.CharacterLimit}` characters with `{value.Length}`:\n```\n{value}\n```";
 
 				if( property.ValidValues != null)
 				{
@@ -315,7 +319,7 @@ namespace Botwinder.modules
 						{
 							string val = property.ValidValues.FirstOrDefault(v => string.Equals(v, parsedValues[i].Value, StringComparison.CurrentCultureIgnoreCase));
 							if( string.IsNullOrEmpty(val) )
-								return $"Invalid value:\n```\n{parsedValues[i]}\n```";
+								return $"`{property.Label}` has invalid value:\n```\n{parsedValues[i]}\n```";
 
 							val = $"{property.Prefix}{val}{property.Suffix}";
 							valueBuilder.Append(i == 0 ? val : (property.Delimiter + val));
@@ -323,7 +327,12 @@ namespace Botwinder.modules
 						value = valueBuilder.ToString();
 				}
 				else if( property.Regex != null && !property.Regex.Match(value).Success )
-					return $"```\n{value}\n```\n...does not match prescribed format for `{property.Label}`";
+				{
+					string regexHelp = "";
+					if( !string.IsNullOrEmpty(property.RegexHelp) )
+						regexHelp = $"`{property.RegexHelp}`";
+					return $"`{property.Label}` does not match prescribed format {regexHelp}\n```\n{value}\n```";
+				}
 
 				fields.Add(property, value);
 			}
