@@ -94,14 +94,14 @@ namespace Botwinder.modules
 
 		private guid FfxivId = 142476055482073089;
 		private Dictionary<string, guid> FfxivChannelIds = new Dictionary<string, ulong>(){
-			["staticAether"] = 647459984870735892,
-			["staticPrimal"] = 647460088302272532,
-			["staticCrystal"] = 647460192446840842,
-			["staticChaos"] = 647460277339684883,
-			["staticLight"] = 647460352589561876,
-			["staticElemental"] = 647460426019373075,
-			["staticGaia"] = 647460490036903967,
-			["staticMana"] = 647460558177828874
+			["staticaether"] = 647459984870735892,
+			["staticprimal"] = 647460088302272532,
+			["staticcrystal"] = 647460192446840842,
+			["staticchaos"] = 647460277339684883,
+			["staticlight"] = 647460352589561876,
+			["staticelemental"] = 647460426019373075,
+			["staticgaia"] = 647460490036903967,
+			["staticmana"] = 647460558177828874
 		};
 		private Dictionary<guid, guid> FfxivMessageIds = new Dictionary<ulong, ulong>(){
 			[647459984870735892] = 647480500424015892, //aether
@@ -199,13 +199,13 @@ namespace Botwinder.modules
 				}
 				else if( e.Server.Id == this.FfxivId )
 				{
-					if( !this.FfxivChannelIds.ContainsKey(e.CommandId) )
+					if( !this.FfxivChannelIds.ContainsKey(e.CommandId.ToLower()) )
 					{
 						return;
 					}
 
 					response = this.FfxivHelpString;
-					channel = e.Server.Guild.GetTextChannel(this.FfxivChannelIds[e.CommandId]);
+					channel = e.Server.Guild.GetTextChannel(this.FfxivChannelIds[e.CommandId.ToLower()]);
 					lastMessage = this.FfxivMessageIds[channel.Id];
 				}
 				else
@@ -239,22 +239,14 @@ namespace Botwinder.modules
 			};
 			commands.Add(newCommand);
 			commands.Add(newCommand.CreateAlias("recruit"));
-			newCommand = newCommand.CreateCopy("staticAether");
-			commands.Add(newCommand);
-			newCommand = newCommand.CreateCopy("staticPrimal");
-			commands.Add(newCommand);
-			newCommand = newCommand.CreateCopy("staticCrystal");
-			commands.Add(newCommand);
-			newCommand = newCommand.CreateCopy("staticLight");
-			commands.Add(newCommand);
-			newCommand = newCommand.CreateCopy("staticChaos");
-			commands.Add(newCommand);
-			newCommand = newCommand.CreateCopy("staticElemental");
-			commands.Add(newCommand);
-			newCommand = newCommand.CreateCopy("staticGaia");
-			commands.Add(newCommand);
-			newCommand = newCommand.CreateCopy("staticMana");
-			commands.Add(newCommand);
+			commands.Add(newCommand.CreateCopy("staticAether"));
+			commands.Add(newCommand.CreateCopy("staticPrimal"));
+			commands.Add(newCommand.CreateCopy("staticCrystal"));
+			commands.Add(newCommand.CreateCopy("staticLight"));
+			commands.Add(newCommand.CreateCopy("staticChaos"));
+			commands.Add(newCommand.CreateCopy("staticElemental"));
+			commands.Add(newCommand.CreateCopy("staticGaia"));
+			commands.Add(newCommand.CreateCopy("staticMana"));
 
 			return commands;
 		}
