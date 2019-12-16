@@ -88,8 +88,8 @@ namespace Botwinder.modules
 			new PropertySpecification(3, false, false, "Goals", new string[]{"-g", "--goals"}, null, 100),
 			new PropertySpecification(4, false, false, "CurrentProgress", new string[]{"-p", "--progress"}, null, 100),
 			new PropertySpecification(5, true, false, "Contact", new string[]{"-k", "--contact"}, null, 55, "", "", "", "@UserMention", "^<@!?\\d+>"),
-			new PropertySpecification(6, true, true, "Schedule", new string[]{"-s", "--schedule"}, null, 100),
-			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 350)
+			new PropertySpecification(6, true, true, "Schedule", new string[]{"-s", "--schedule"}, null, 150),
+			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 500)
 		};
 
 		private guid FfxivId = 142476055482073089;
