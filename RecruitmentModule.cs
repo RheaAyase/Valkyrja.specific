@@ -120,8 +120,8 @@ namespace Botwinder.modules
 		                       "[ -l ][ --lookingfor  ] | Looking for - class or role emojis\n" +
 		                       "[ -g ][ --goals       ] | Group goals. Savage? Ultimate?\n" +
 		                       "[ -p ][ --progress    ] | Current progress of the static\n" +
-		                       "[ -s ][ --schedule  ]   | Raid schedule, don't forget timezone (UTC?) (optional)\n" +
-		                       "[ -k ][ --contact  ]    | User mention of a contact person to reach out to\n" +
+		                       "[ -s ][ --schedule    ] | Raid schedule, don't forget timezone (UTC?) (optional)\n" +
+		                       "[ -k ][ --contact     ] | User mention of a contact person to reach out to\n" +
 		                       "[ -d ][ --description ] | Up to 500 characters of group description\n" +
 		                       "\nNote: --description can be text that supports [markdown](links)." +
 		                       "\nExample: ?recruitment --name Nine Valkyries -c PLD AST DNC -l :melee: -g Savage & Ultimate -p Cleared it all. -k @Valkyrja#7811 -d Die in Battle and Go to Valhalla!" +
