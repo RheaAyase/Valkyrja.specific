@@ -92,6 +92,9 @@ namespace Botwinder.modules
 			new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 500)
 		};
 
+		private guid LightId = 424542406860603434;
+		private guid LightChannelId = 142476055482073089;
+		private guid LightMessageId = 0;
 		private guid FfxivId = 142476055482073089;
 		private Dictionary<string, guid> FfxivChannelIds = new Dictionary<string, ulong>(){
 			["staticaether"] = 647459984870735892,
@@ -159,6 +162,11 @@ namespace Botwinder.modules
 					channels.Add(e.Server.Guild.GetTextChannel(this.EdcChannelId));
 					lastMessages.Add(this.EdcChannelId, this.EdcMessageId);
 				}
+				else if( e.Server.Id == this.LightId )
+				{
+					channels.Add(e.Server.Guild.GetTextChannel(this.LightChannelId));
+					lastMessages.Add(this.LightChannelId, this.LightMessageId);
+				}
 				else if( e.Server.Id == this.FfxivId )
 				{
 					channels = this.FfxivChannelIds.Select(c => e.Server.Guild.GetTextChannel(c.Value)).ToList();
@@ -196,6 +204,12 @@ namespace Botwinder.modules
 					response = this.EdcHelpString;
 					channel = e.Server.Guild.GetTextChannel(this.EdcChannelId);
 					lastMessage = this.EdcMessageId;
+				}
+				else if( e.Server.Id == this.LightId )
+				{
+					response = this.FfxivHelpString;
+					channel = e.Server.Guild.GetTextChannel(this.LightChannelId);
+					lastMessage = this.LightMessageId;
 				}
 				else if( e.Server.Id == this.FfxivId )
 				{
