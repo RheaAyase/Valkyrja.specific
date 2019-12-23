@@ -3,6 +3,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Botwinder.core.csproj" />
+    <ProjectReference Include="..\Core\Valkyrja.core.csproj" />
   </ItemGroup>
 </Project>

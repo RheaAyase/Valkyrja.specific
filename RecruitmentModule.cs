@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Botwinder.core;
-using Botwinder.entities;
+using Valkyrja.core;
+using Valkyrja.entities;
 using Discord;
 using Discord.WebSocket;
 using guid = System.UInt64;
 
-namespace Botwinder.modules
+namespace Valkyrja.modules
 {
 	public class Recruitment : IModule
 	{
@@ -135,14 +135,14 @@ namespace Botwinder.modules
 		private readonly Regex CommandValueRegex = new Regex("<?[:@]?!?\\w+((?=:):\\d+>)?>?", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 		private readonly Regex UserIdRegex = new Regex("\\d+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
-		private BotwinderClient Client;
+		private ValkyrjaClient Client;
 
 		public Func<Exception, string, guid, Task> HandleException{ get; set; }
 		public bool DoUpdate{ get; set; } = false;
 
-		public List<Command> Init(IBotwinderClient iClient)
+		public List<Command> Init(IValkyrjaClient iClient)
 		{
-			this.Client = iClient as BotwinderClient;
+			this.Client = iClient as ValkyrjaClient;
 			List<Command> commands = new List<Command>();
 
 // !removeRecruitment
@@ -367,7 +367,7 @@ namespace Botwinder.modules
 			throw new NotImplementedException();
 		}
 
-		public Task Update(IBotwinderClient iClient)
+		public Task Update(IValkyrjaClient iClient)
 		{
 			return Task.CompletedTask;
 		}
