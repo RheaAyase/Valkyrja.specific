@@ -272,21 +272,20 @@ namespace Valkyrja.modules
 			do
 			{
 				IMessage[] downloaded = await channel.GetMessagesAsync(lastMessage, Direction.After, 100, CacheMode.AllowDownload).Flatten().ToArray();
-				lastMessage = messages.FirstOrDefault()?.Id ?? 0;
+				lastMessage = downloaded.FirstOrDefault()?.Id ?? 0;
 				downloadedCount = downloaded.Length;
 				if( downloaded.Any() )
 					messages.AddRange(downloaded);
 			} while( downloadedCount >= 100 && lastMessage > 0 );
 
-			IMessage message = messages.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
-			if( message != null )
+			foreach( IMessage msg in messages.Where(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId) )
 			{
 				//todo if( message.embed == newembed ) return; ~ do not just bump the post without changing anything.
 				//todo support modifying a single property...
 				//await (message as SocketUserMessage).ModifyAsync(m => ModifyRecruitmentEmbed(e, m));
 				//await e.SendReplySafe("All done.");
 				//return;
-				await message.DeleteAsync();
+				await msg.DeleteAsync();
 			}
 		}
 
