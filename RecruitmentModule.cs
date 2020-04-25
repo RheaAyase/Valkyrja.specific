@@ -65,7 +65,6 @@ namespace Valkyrja.modules
 
 		private guid EdcId = 89778537522802688;
 		private guid EdcChannelId = 523925543045955594;
-		private guid EdcMessageId = 523927539983581196;
 		string EdcHelpString = "```md\nCreate or modify your #recruitment post with the following properties:\n\n" +
 		                  "[ -t ][ --logo        ] | Optional URL to your logo (up to 128px)\n" +
 		                  "[ -n ][ --name        ] | Name of your playergroup (up to 30char)\n" +
@@ -94,7 +93,6 @@ namespace Valkyrja.modules
 
 		private guid LightId = 424542406860603434;
 		private guid LightChannelId = 142476055482073089;
-		private guid LightMessageId = 0;
 		private guid FfxivId = 142476055482073089;
 		private Dictionary<string, guid> FfxivChannelIds = new Dictionary<string, ulong>(){
 			["staticaether"] = 647459984870735892,
@@ -105,16 +103,6 @@ namespace Valkyrja.modules
 			["staticelemental"] = 647460426019373075,
 			["staticgaia"] = 647460490036903967,
 			["staticmana"] = 647460558177828874
-		};
-		private Dictionary<guid, guid> FfxivMessageIds = new Dictionary<ulong, ulong>(){
-			[647459984870735892] = 647480500424015892, //aether
-			[647460088302272532] = 647480532321697820, //primal
-			[647460192446840842] = 647480562017370151, //crystal
-			[647460277339684883] = 647480602697793540, //chaos
-			[647460352589561876] = 647480648428421121, //light
-			[647460426019373075] = 647480706792030228, //elemental
-			[647460490036903967] = 647480763813724179, //gaia
-			[647460558177828874] = 647480798043176962  //mana
 		};
 		string FfxivHelpString = "```md\nCreate or modify your recruitment post with the following properties. Remember, only the \"optional\" ones are optional.\n\n" +
 		                       "[ -t ][ --logo        ] | URL to your logo (optional, up to 128px)\n" +
@@ -156,21 +144,17 @@ namespace Valkyrja.modules
 					return;
 
 				List<SocketTextChannel> channels = new List<SocketTextChannel>();
-				Dictionary<guid, guid> lastMessages = new Dictionary<guid, guid>();
 				if( e.Server.Id == this.EdcId )
 				{
 					channels.Add(e.Server.Guild.GetTextChannel(this.EdcChannelId));
-					lastMessages.Add(this.EdcChannelId, this.EdcMessageId);
 				}
 				else if( e.Server.Id == this.LightId )
 				{
 					channels.Add(e.Server.Guild.GetTextChannel(this.LightChannelId));
-					lastMessages.Add(this.LightChannelId, this.LightMessageId);
 				}
 				else if( e.Server.Id == this.FfxivId )
 				{
 					channels = this.FfxivChannelIds.Select(c => e.Server.Guild.GetTextChannel(c.Value)).ToList();
-					lastMessages = this.FfxivMessageIds;
 				}
 				else
 				{
@@ -179,7 +163,7 @@ namespace Valkyrja.modules
 
 				foreach( SocketTextChannel channel in channels )
 				{
-					await DeletePreviousMessage(channel, lastMessages[channel.Id], e.Message.Author.Id);
+					await DeletePreviousMessage(channel, e.Message.Author.Id);
 				}
 
 				await e.SendReplySafe("Byeee!");
@@ -198,18 +182,15 @@ namespace Valkyrja.modules
 
 				string response = "";
 				IMessageChannel channel = null;
-				guid lastMessage = 0;
 				if( e.Server.Id == this.EdcId )
 				{
 					response = this.EdcHelpString;
 					channel = e.Server.Guild.GetTextChannel(this.EdcChannelId);
-					lastMessage = this.EdcMessageId;
 				}
 				else if( e.Server.Id == this.LightId )
 				{
 					response = this.FfxivHelpString;
 					channel = e.Server.Guild.GetTextChannel(this.LightChannelId);
-					lastMessage = this.LightMessageId;
 				}
 				else if( e.Server.Id == this.FfxivId )
 				{
@@ -220,7 +201,6 @@ namespace Valkyrja.modules
 
 					response = this.FfxivHelpString;
 					channel = e.Server.Guild.GetTextChannel(this.FfxivChannelIds[e.CommandId.ToLower()]);
-					lastMessage = this.FfxivMessageIds[channel.Id];
 				}
 				else
 				{
@@ -233,7 +213,7 @@ namespace Valkyrja.modules
 					return;
 				}
 
-				await DeletePreviousMessage(channel, lastMessage, e.Message.Author.Id);
+				await DeletePreviousMessage(channel, e.Message.Author.Id);
 
 				object embed = GetRecruitmentEmbed(e);
 				if( embed != null )
@@ -265,27 +245,13 @@ namespace Valkyrja.modules
 			return commands;
 		}
 
-		private async Task DeletePreviousMessage(IMessageChannel channel, guid lastMessage, guid authorId)
+		private async Task DeletePreviousMessage(IMessageChannel channel, guid authorId)
 		{
-			List<IMessage> messages = new List<IMessage>();
-			int downloadedCount = 0;
-			do
+			await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 			{
-				IMessage[] downloaded = await channel.GetMessagesAsync(lastMessage, Direction.After, 100, CacheMode.AllowDownload).Flatten().ToArray();
-				lastMessage = downloaded.FirstOrDefault()?.Id ?? 0;
-				downloadedCount = downloaded.Length;
-				if( downloaded.Any() )
-					messages.AddRange(downloaded);
-			} while( downloadedCount >= 100 && lastMessage > 0 );
-
-			foreach( IMessage msg in messages.Where(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId) )
-			{
-				//todo if( message.embed == newembed ) return; ~ do not just bump the post without changing anything.
-				//todo support modifying a single property...
-				//await (message as SocketUserMessage).ModifyAsync(m => ModifyRecruitmentEmbed(e, m));
-				//await e.SendReplySafe("All done.");
-				//return;
-				await msg.DeleteAsync();
+				IMessage message = list.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
+				if( message != null )
+					await message.DeleteAsync();
 			}
 		}
 
