@@ -132,7 +132,7 @@ namespace Valkyrja.modules
 						TimeSpan diff = DateTime.UtcNow - Utils.GetTimeFromId(message.Id);
 						if( diff < TimeSpan.FromDays(this.BumpDays) )
 						{
-							return $"Gotta wait {Utils.GetDurationString(diff).Replace("for", "another")}";
+							return $"Gotta wait {Utils.GetDurationString(TimeSpan.FromDays(this.BumpDays) - diff).Replace("for", "another")}";
 						}
 
 						await channel.SendMessageAsync(message.Content, embed: message.Embeds.First() as Embed);
@@ -165,18 +165,19 @@ namespace Valkyrja.modules
 					if( returnValue is Embed embed )
 					{
 						bool replaced = false;
+						response = "All done!";
 						await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 						{
 							if( list.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == commandArgs.Message.Author.Id) is IUserMessage message )
 							{
 								replaced = true;
 								await message.ModifyAsync(m => m.Embed = embed);
+								response = "I've modified your previous post.";
 								break;
 							}
 						}
 						if( !replaced )
 							await channel.SendMessageAsync($"<@{commandArgs.Message.Author.Id}>'s post:", embed: embed);
-						response = "All done!";
 					}
 					else if( returnValue is string errorText )
 					{
@@ -264,7 +265,7 @@ namespace Valkyrja.modules
 		//Especially the way I treat this list...
 		private readonly Dictionary<guid, ServerConfiguration> ServerConfigurations = new Dictionary<guid, ServerConfiguration>(){
 			[89778537522802688] = new ServerConfiguration(
-				89778537522802688,
+				89778537522802688, // EDC
 				new List<PropertySpecification>{
 					new PropertySpecification(-1, false, true, "", new string[]{"-b", "--logo"}, null, 500),
 					new PropertySpecification(0, false, false, "Name", new string[]{"-n", "--name"}, null, 30),
@@ -276,7 +277,7 @@ namespace Valkyrja.modules
 					new PropertySpecification(6, false, true, "Links", new string[]{"-l", "--link"}, null, 100),
 					new PropertySpecification(7, false, false, "Description", new string[]{"-d", "--description"}, null, 500)
 				},
-				new Dictionary<string, guid>(){["recruitment"] = 523925543045955594, ["lfg"] = 523925543045955594},
+				new Dictionary<string, guid>(){["recruitment"] = 754432646024790027, ["lfg"] = 754432646024790027},
 				"```md\nCreate or modify your #recruitment post with the following properties:\n\n" +
 				"[ -t ][ --logo        ] | Optional URL to your logo (up to 128px)\n" +
 				"[ -n ][ --name        ] | Name of your playergroup (up to 30char)\n" +
@@ -294,7 +295,7 @@ namespace Valkyrja.modules
 				14
 			),
 			[142476055482073089] = new ServerConfiguration(
-				142476055482073089,
+				142476055482073089, // FFXIV
 				new List<PropertySpecification>{
 					new PropertySpecification(-1, false, true, "", new string[]{"-t", "--logo"}, null, 300),
 					new PropertySpecification(0, false, false, "Name", new string[]{"-n", "--name"}, null, 30),
@@ -357,8 +358,6 @@ namespace Valkyrja.modules
 					return;
 
 				await this.ServerConfigurations[e.Server.Id].Bump(e);
-
-				await e.SendReplySafe("Byeee!");
 			};
 			commands.Add(newCommand);
 
