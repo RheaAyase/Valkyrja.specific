@@ -288,7 +288,7 @@ namespace Valkyrja.modules
 				"[ -l ][ --link        ] | Links to your Inara or Discord (optional field up to 100char)\n" +
 				"[ -d ][ --description ] | Up to 500 characters of group description.\n" +
 				"\nNote: --link and --description can be text that supports [markdown](links)." +
-				"\nExample: !recruitment --name The Elite -p PC PS4 XBox -t EU NA APAC -c Discord --link [Discord](https://discord.gg/elite) -d Weirdoes." +
+				"\nExample: !lfg --name The Elite -p PC PS4 XBox -t EU NA APAC -c Discord --link [Discord](https://discord.gg/elite) -d Weirdoes." +
 				"\n```",
 				Color.Orange,
 				14
