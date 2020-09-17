@@ -168,7 +168,7 @@ namespace Valkyrja.modules
 						response = "All done!";
 						await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 						{
-							if( list.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == commandArgs.Message.Author.Id) is IUserMessage message )
+							if( list.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == commandArgs.Message.Author.Id) is IUserMessage message )
 							{
 								replaced = true;
 								await message.ModifyAsync(m => m.Embed = embed);
