@@ -102,7 +102,7 @@ namespace Valkyrja.modules
 			{
 				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 				{
-					IMessage message = list.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
+					IMessage message = list.FirstOrDefault(m => m.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
 					if( message != null )
 						await message.DeleteAsync();
 				}
@@ -126,7 +126,7 @@ namespace Valkyrja.modules
 			{
 				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 				{
-					IMessage message = list.FirstOrDefault(m => guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
+					IMessage message = list.FirstOrDefault(m => m.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
 					if( message != null )
 					{
 						TimeSpan diff = DateTime.UtcNow - Utils.GetTimeFromId(message.Id);
