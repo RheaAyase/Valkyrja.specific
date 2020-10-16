@@ -105,6 +105,9 @@ namespace Valkyrja.modules
 				int count = 0;
 				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 				{
+					if( !list.Any() )
+						continue;
+
 					count++;
 					if( list.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && guid.TryParse(commandArgs.TrimmedMessage, out guid argId) && id == argId) is IUserMessage message )
 					{
@@ -136,6 +139,9 @@ namespace Valkyrja.modules
 			{
 				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 				{
+					if( !list.Any() )
+						continue;
+
 					IMessage message = list.FirstOrDefault(m => m.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
 					if( message != null )
 						await message.DeleteAsync();
@@ -160,6 +166,9 @@ namespace Valkyrja.modules
 			{
 				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 				{
+					if( !list.Any() )
+						continue;
+
 					IMessage message = list.FirstOrDefault(m => m.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
 					if( message != null )
 					{
@@ -202,6 +211,9 @@ namespace Valkyrja.modules
 						response = "All done!";
 						await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
 						{
+							if( !list.Any() )
+								continue;
+
 							if( list.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == commandArgs.Message.Author.Id) is IUserMessage message )
 							{
 								replaced = true;
