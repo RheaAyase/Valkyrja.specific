@@ -72,6 +72,7 @@ namespace Valkyrja.modules
 				this.Color = color;
 				this.BumpDays = bumpDays;
 			}
+
 			public ServerConfiguration(guid serverId, IEnumerable<PropertySpecification> properties, Dictionary<string, guid> commandChannelPairs, string helpString, Color color, int bumpDays, Regex paramRegex, Regex optionRegex, Regex valueRegex)
 			{
 				this.ServerId = serverId;
@@ -85,6 +86,40 @@ namespace Valkyrja.modules
 				this.CommandValueRegex = valueRegex;
 			}
 
+			public async Task Find(CommandArguments commandArgs)
+			{
+				foreach( guid channelId in this.CommandChannelPairs.Values )
+				{
+					SocketTextChannel channel = commandArgs.Server.Guild.GetTextChannel(channelId);
+					if( channel == null )
+						continue;
+
+					await Find(channel, commandArgs);
+				}
+			}
+
+			private async Task Find(IMessageChannel channel, CommandArguments commandArgs)
+			{
+				string response = "meep";
+				bool found = false;
+				int count = 0;
+				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
+				{
+					count++;
+					if( list.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && guid.TryParse(commandArgs.TrimmedMessage, out guid argId) && id == argId) is IUserMessage message )
+					{
+						found = true;
+						response = $"Found message `{message.Id}` at position `{count}`\n{message.Content}";
+						break;
+					}
+				}
+
+				if( !found )
+					response = $"Not found after {count} messages.";
+
+				await commandArgs.SendReplySafe(response);
+			}
+
 			public async Task DeletePreviousMessages(CommandArguments commandArgs)
 			{
 				foreach( guid channelId in this.CommandChannelPairs.Values )
@@ -95,7 +130,6 @@ namespace Valkyrja.modules
 
 					await DeletePreviousMessages(channel, commandArgs.Message.Author.Id);
 				}
-
 			}
 
 			private async Task DeletePreviousMessages(IMessageChannel channel, guid authorId)
@@ -374,6 +408,21 @@ namespace Valkyrja.modules
 				await this.ServerConfigurations[e.Server.Id].DeletePreviousMessages(e);
 
 				await e.SendReplySafe("Byeee!");
+			};
+			commands.Add(newCommand);
+			commands.Add(newCommand.CreateAlias("removeRecruitment"));
+
+// !lfgFind
+			newCommand = new Command("lfgFind");
+			newCommand.Type = CommandType.Standard;
+			newCommand.Description = "";
+			newCommand.RequiredPermissions = PermissionType.OwnerOnly;
+			newCommand.IsHidden = true;
+			newCommand.OnExecute += async e => {
+				if( !this.ServerConfigurations.ContainsKey(e.Server.Id) )
+					return;
+
+				await this.ServerConfigurations[e.Server.Id].Find(e);
 			};
 			commands.Add(newCommand);
 			commands.Add(newCommand.CreateAlias("removeRecruitment"));
