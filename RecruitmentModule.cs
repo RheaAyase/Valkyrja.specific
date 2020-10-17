@@ -103,13 +103,16 @@ namespace Valkyrja.modules
 				string response = "meep";
 				bool found = false;
 				int count = 0;
-				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
+				guid lastMessageId = 0;
+				while(true)
 				{
-					if( !list.Any() )
-						continue;
+					IEnumerable<IMessage> batch = await channel.GetMessagesAsync(lastMessageId+1, Direction.After, 100, CacheMode.AllowDownload).FlattenAsync();
+					if( batch == null || !batch.Any() )
+						break;
+					lastMessageId = batch.Last().Id;
 
 					count++;
-					if( list.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && guid.TryParse(commandArgs.TrimmedMessage, out guid argId) && id == argId) is IUserMessage message )
+					if( batch.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && guid.TryParse(commandArgs.TrimmedMessage, out guid argId) && id == argId) is IUserMessage message )
 					{
 						found = true;
 						response = $"Found message `{message.Id}` at position `{count}`\n{message.Content}";
@@ -137,12 +140,15 @@ namespace Valkyrja.modules
 
 			private async Task DeletePreviousMessages(IMessageChannel channel, guid authorId)
 			{
-				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
+				guid lastMessageId = 0;
+				while(true)
 				{
-					if( !list.Any() )
-						continue;
+					IEnumerable<IMessage> batch = await channel.GetMessagesAsync(lastMessageId+1, Direction.After, 100, CacheMode.AllowDownload).FlattenAsync();
+					if( batch == null || !batch.Any() )
+						break;
+					lastMessageId = batch.Last().Id;
 
-					IMessage message = list.FirstOrDefault(m => m.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
+					IMessage message = batch.FirstOrDefault(m => m.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
 					if( message != null )
 						await message.DeleteAsync();
 				}
@@ -164,12 +170,15 @@ namespace Valkyrja.modules
 			}
 			private async Task<string> Bump(IMessageChannel channel, guid authorId)
 			{
-				await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
+				guid lastMessageId = 0;
+				while(true)
 				{
-					if( !list.Any() )
-						continue;
+					IEnumerable<IMessage> batch = await channel.GetMessagesAsync(lastMessageId+1, Direction.After, 100, CacheMode.AllowDownload).FlattenAsync();
+					if( batch == null || !batch.Any() )
+						break;
+					lastMessageId = batch.Last().Id;
 
-					IMessage message = list.FirstOrDefault(m => m.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
+					IMessage message = batch.FirstOrDefault(m => m.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == authorId);
 					if( message != null )
 					{
 						TimeSpan diff = DateTime.UtcNow - Utils.GetTimeFromId(message.Id);
@@ -209,12 +218,15 @@ namespace Valkyrja.modules
 					{
 						bool replaced = false;
 						response = "All done!";
-						await foreach( IReadOnlyCollection<IMessage> list in channel.GetMessagesAsync(0, Direction.After, 1000, CacheMode.AllowDownload) )
+						guid lastMessageId = 0;
+						while(true)
 						{
-							if( !list.Any() )
-								continue;
+							IEnumerable<IMessage> batch = await channel.GetMessagesAsync(lastMessageId+1, Direction.After, 100, CacheMode.AllowDownload).FlattenAsync();
+							if( batch == null || !batch.Any() )
+								break;
+							lastMessageId = batch.Last().Id;
 
-							if( list.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == commandArgs.Message.Author.Id) is IUserMessage message )
+							if( batch.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == commandArgs.Message.Author.Id) is IUserMessage message )
 							{
 								replaced = true;
 								await message.ModifyAsync(m => m.Embed = embed);
