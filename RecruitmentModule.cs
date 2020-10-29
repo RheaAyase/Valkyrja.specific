@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Valkyrja.core;
 using Valkyrja.entities;
 using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
 using guid = System.UInt64;
 
@@ -226,11 +227,23 @@ namespace Valkyrja.modules
 								break;
 							lastMessageId = batch.Last().Id;
 
-							if( batch.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == commandArgs.Message.Author.Id) is IUserMessage message )
+							IMessage message = batch.FirstOrDefault(m => m?.Content != null && guid.TryParse(this.UserIdRegex.Match(m.Content).Value, out guid id) && id == commandArgs.Message.Author.Id);
+							if( message != null )
 							{
 								replaced = true;
-								await message.ModifyAsync(m => m.Embed = embed);
 								response = "I've modified your previous post.";
+								switch( message )
+								{
+									case SocketUserMessage msg:
+										await msg.ModifyAsync(m => m.Embed = embed);
+										break;
+									case RestUserMessage msg:
+										await msg.ModifyAsync(m => m.Embed = embed);
+										break;
+									default:
+										response = "I wasn't able to modify the old post.";
+										break;
+								}
 								break;
 							}
 						}
