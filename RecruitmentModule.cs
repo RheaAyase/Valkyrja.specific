@@ -350,7 +350,7 @@ namespace Valkyrja.modules
 				},
 				new Dictionary<string, guid>(){["recruitment"] = 754432646024790027, ["lfg"] = 754432646024790027},
 				"```md\nCreate or modify your #recruitment post with the following properties:\n\n" +
-				"[ -t ][ --logo        ] | Optional URL to your logo (up to 128px)\n" +
+				"[ -b ][ --logo        ] | Optional URL to your logo (up to 128px)\n" +
 				"[ -n ][ --name        ] | Name of your playergroup (up to 30char)\n" +
 				"[ -p ][ --platform    ] | Platform: PC, XBox or PS4\n" +
 				"[ -t ][ --timezone    ] | Timezone: EU, NA or APAC\n" +
