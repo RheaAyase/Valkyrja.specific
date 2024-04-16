@@ -34,11 +34,11 @@ namespace Valkyrja.modules
 		//This is a hardcoded server specific feature, the code is one huge hack and nobody should even read it. It's disgusting!
 		//Especially the way I treat this list...
 		private readonly Dictionary<guid, FilterSpecification> ServerConfigurations = new Dictionary<guid, FilterSpecification>(){
-				[552293123766878208] = new FilterSpecification(
+				/*[552293123766878208] = new FilterSpecification(
 					552293123766878208, // Chill Homelab
 					new Regex("https?://(www\\.)?reddit\\.com", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
 					"https://old.reddit.com"
-			)};
+			)*/};
 
 		private ValkyrjaClient Client;
 
