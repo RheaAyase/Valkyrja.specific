@@ -21,24 +21,26 @@ namespace Valkyrja.modules
 			public guid ServerId;
 			public Regex Regex = null;
 			public string ReplaceWith = null;
+			public string Append = null;
 
-			public FilterSpecification(guid serverId, Regex regex, string replaceWith)
+			public FilterSpecification(guid serverId, Regex regex, string replaceWith, string append)
 			{
 				this.ServerId = serverId;
 				this.Regex = regex;
 				this.ReplaceWith = replaceWith;
-
+				this.Append = append;
 			}
 		}
 
 		//This is a hardcoded server specific feature, the code is one huge hack and nobody should even read it. It's disgusting!
 		//Especially the way I treat this list...
 		private readonly Dictionary<guid, FilterSpecification> ServerConfigurations = new Dictionary<guid, FilterSpecification>(){
-				/*[552293123766878208] = new FilterSpecification(
+				[552293123766878208] = new FilterSpecification(
 					552293123766878208, // Chill Homelab
-					new Regex("https?://(www\\.)?reddit\\.com", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
-					"https://old.reddit.com"
-			)*/};
+					new Regex("https?://(www\\.)?amazon\\.com/", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
+					"https://amazon.com/",
+					"&tag=smarthomesell-20"
+			)};
 
 		private ValkyrjaClient Client;
 
@@ -74,10 +76,14 @@ namespace Valkyrja.modules
 
 			if( !config.Regex.IsMatch(message.Content) )
 				return;
-			
+
 			try
 			{
-				string output = config.Regex.Replace(message.Content, config.ReplaceWith).Replace("@everyone", "@-everyone").Replace("@here", "@-here");
+				string append = config.Append;
+				if( append.StartsWith("&") && !message.Content.Contains('?') )
+					append = append.Replace("&", "?");
+
+				string output = config.Regex.Replace(message.Content, config.ReplaceWith + append).Replace("@everyone", "@-everyone").Replace("@here", "@-here");
 				await channel.SendMessageSafe($"**__{message.Author.Username} said:__**\n{output}");
 				await message.DeleteAsync();
 
