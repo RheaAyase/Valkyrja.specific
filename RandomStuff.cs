@@ -37,8 +37,8 @@ namespace Valkyrja.modules
 		private readonly Dictionary<guid, FilterSpecification> ServerConfigurations = new Dictionary<guid, FilterSpecification>(){
 				[552293123766878208] = new FilterSpecification(
 					552293123766878208, // Chill Homelab
-					new Regex("https?://(www\\.)?amazon\\.com/", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
-					"https://amazon.com/",
+					new Regex("https?://(www\\.)?amazon\\.com/.*\\b", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
+					"",
 					"&tag=smarthomesell-20"
 			)};
 
@@ -71,7 +71,7 @@ namespace Valkyrja.modules
 		private async Task OnMessageReceived(SocketMessage message)
 		{
 			FilterSpecification config = null;
-			if( message.Channel is not SocketTextChannel channel || !this.ServerConfigurations.ContainsKey(channel.Guild.Id) || (config = this.ServerConfigurations[channel.Guild.Id]) == null )
+			if( message.Author.IsBot || message.Channel is not SocketTextChannel channel || !this.ServerConfigurations.ContainsKey(channel.Guild.Id) || (config = this.ServerConfigurations[channel.Guild.Id]) == null )
 				return;
 
 			if( !config.Regex.IsMatch(message.Content) )
@@ -79,11 +79,16 @@ namespace Valkyrja.modules
 
 			try
 			{
-				string append = config.Append;
-				if( append.StartsWith("&") && !message.Content.Contains('?') )
+				string append = config.Append ?? "";
+				if( !string.IsNullOrEmpty(config.Append) && append.StartsWith("&") && !message.Content.Contains('?') )
 					append = append.Replace("&", "?");
 
-				string output = config.Regex.Replace(message.Content, config.ReplaceWith + append).Replace("@everyone", "@-everyone").Replace("@here", "@-here");
+				string match = config.Regex.Match(message.Content).Value.TrimEnd();
+				string replaceWith = config.ReplaceWith + append;
+				if( string.IsNullOrEmpty(config.ReplaceWith) )
+					replaceWith = match + append;
+
+				string output = config.Regex.Replace(match, replaceWith).Replace("@everyone", "@-everyone").Replace("@here", "@-here");
 				await channel.SendMessageSafe($"**__{message.Author.Username} said:__**\n{output}");
 				await message.DeleteAsync();
 
