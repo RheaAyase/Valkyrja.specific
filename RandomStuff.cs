@@ -37,7 +37,7 @@ namespace Valkyrja.modules
 		private readonly Dictionary<guid, FilterSpecification> ServerConfigurations = new Dictionary<guid, FilterSpecification>(){
 				[552293123766878208] = new FilterSpecification(
 					552293123766878208, // Chill Homelab
-					new Regex("https?://(www\\.)?amazon\\.com/.*\\b", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
+					new Regex("https?://(www\\.)?amazon\\.\\S*", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
 					"",
 					"&tag=smarthomesell-20"
 			)};
