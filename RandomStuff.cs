@@ -37,7 +37,7 @@ namespace Valkyrja.modules
 		private readonly Dictionary<guid, FilterSpecification> ServerConfigurations = new Dictionary<guid, FilterSpecification>(){
 				[552293123766878208] = new FilterSpecification(
 					552293123766878208, // Chill Homelab
-					new Regex("https?://(www\\.)?amazon\\.\\S*", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
+					new Regex("https?://(www\\.)?ama?zo?n\\.\\S*", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)),
 					"",
 					"&tag=smarthomesell-20"
 			)};
@@ -79,23 +79,22 @@ namespace Valkyrja.modules
 
 			try
 			{
-				string append = config.Append ?? "";
-				if( !string.IsNullOrEmpty(config.Append) && append.StartsWith("&") && !message.Content.Contains('?') )
-					append = append.Replace("&", "?");
-				string replaceWith = config.ReplaceWith + append;
-
 				string output = message.Content;
 				if( string.IsNullOrEmpty(config.ReplaceWith) )
 				{
 					foreach( Match match in config.Regex.Matches(message.Content) )
 					{
-						replaceWith = match.Value + append;
-						output = output.Replace(match.Value, replaceWith);
+						string append = config.Append ?? "";
+						if( append.StartsWith("&") && !match.Value.Contains('?') )
+							append = append.Replace("&", "?");
+
+						append = match.Value + append;
+						output = output.Replace(match.Value, append);
 					}
 				}
 				else
 				{
-					output = config.Regex.Replace(message.Content, replaceWith);
+					output = config.Regex.Replace(message.Content, config.ReplaceWith);
 				}
 
 				await channel.SendMessageSafe($"**__{message.Author.Username} said:__**\n{output.Replace("@everyone", "@-everyone").Replace("@here", "@-here")}");
