@@ -82,14 +82,23 @@ namespace Valkyrja.modules
 				string append = config.Append ?? "";
 				if( !string.IsNullOrEmpty(config.Append) && append.StartsWith("&") && !message.Content.Contains('?') )
 					append = append.Replace("&", "?");
-
-				string match = config.Regex.Match(message.Content).Value.TrimEnd();
 				string replaceWith = config.ReplaceWith + append;
-				if( string.IsNullOrEmpty(config.ReplaceWith) )
-					replaceWith = match + append;
 
-				string output = config.Regex.Replace(match, replaceWith).Replace("@everyone", "@-everyone").Replace("@here", "@-here");
-				await channel.SendMessageSafe($"**__{message.Author.Username} said:__**\n{output}");
+				string output = message.Content;
+				if( string.IsNullOrEmpty(config.ReplaceWith) )
+				{
+					foreach( Match match in config.Regex.Matches(message.Content) )
+					{
+						replaceWith = match.Value + append;
+						output = output.Replace(match.Value, replaceWith);
+					}
+				}
+				else
+				{
+					output = config.Regex.Replace(message.Content, replaceWith);
+				}
+
+				await channel.SendMessageSafe($"**__{message.Author.Username} said:__**\n{output.Replace("@everyone", "@-everyone").Replace("@here", "@-here")}");
 				await message.DeleteAsync();
 
 			} catch(Exception exception)
